@@ -1,17 +1,8 @@
 <?php declare(strict_types=1);
 namespace DiabloMedia\Robo;
 
-require_once '/home/apringle/github/robo-mysqldump-php/src/Dump.php';
-require_once '/home/apringle/github/robo-mysqldump-php/src/DumpData.php';
-require_once '/home/apringle/github/robo-mysqldump-php/src/DumpSchema.php';
-require_once '/home/apringle/github/robo-mysqldump-php/src/DumpDataPartial.php';
-require_once '/home/apringle/github/robo-mysqldump-php/src/Tasks.php';
-require_once '/home/apringle/github/robo-db-dumper/src/Task/Mysql/DumpGrants.php';
-require_once '/home/apringle/github/robo-db-dumper/src/Task/Mysql/Tasks.php';
-
 use DateTime;
 use Exception;
-use Ifsnop\Mysqldump\Mysqldump;
 use Symfony\Component\Console\Input\InputOption;
 
 abstract class RoboFile extends \Robo\Tasks
