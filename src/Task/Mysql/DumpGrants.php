@@ -11,15 +11,54 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
 {
     use BuilderAwareTrait;
 
+    /**
+     * @var string
+     */
     protected $dsn;
+
+    /**
+     * @var string
+     */
     protected $user;
+
+    /**
+     * @var string
+     */
     protected $pass;
+
+    /**
+     * @var string
+     */
     protected $file;
+
+    /**
+     * @var string
+     */
     protected $sourceUser;
+
+    /**
+     * @var string
+     */
     protected $sourceHost;
+
+    /**
+     * @var string
+     */
     protected $destinationUser;
+
+    /**
+     * @var string
+     */
     protected $destinationHost;
+
+    /**
+     * @var string
+     */
     protected $destinationPassword;
+
+    /**
+     * @var bool
+     */
     protected $append;
 
     public function __construct(string $dsn, string $user, string $pass)

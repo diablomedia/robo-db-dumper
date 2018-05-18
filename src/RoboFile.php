@@ -3,6 +3,7 @@ namespace DiabloMedia\Robo;
 
 use DateTime;
 use Exception;
+use Robo\Result;
 use Symfony\Component\Console\Input\InputOption;
 
 abstract class RoboFile extends \Robo\Tasks
@@ -10,14 +11,49 @@ abstract class RoboFile extends \Robo\Tasks
     use Task\MysqldumpPhp\Tasks;
     use Task\Mysql\Tasks;
 
+    /**
+     * @var string
+     */
     protected $hostname;
+
+    /**
+     * @var string
+     */
     protected $database;
+
+    /**
+     * @var string
+     */
     protected $password;
+
+    /**
+     * @var string
+     */
     protected $dsn;
+
+    /**
+     * @var string
+     */
     protected $username = 'root';
+
+    /**
+     * @var string
+     */
     protected $dumpDir;
+
+    /**
+     * @var string
+     */
     protected $dumpSchemaFile = '00-Schema.sql';
+
+    /**
+     * @var string
+     */
     protected $dumpFullFile   = '05-FullTables.sql';
+
+    /**
+     * @var string
+     */
     protected $dumpGrantsFile = '9999-Grants.sql';
 
     public function __construct()
@@ -37,18 +73,34 @@ abstract class RoboFile extends \Robo\Tasks
         }
     }
 
+    /**
+     * @return string[]
+     */
     abstract protected function getGrantUsers();
+
+    /**
+     * @return string[]
+     */
     abstract protected function getDefaultDataFilters();
+
+    /**
+     * @return string[]
+     */
     abstract protected function getDefaultDataExcludes();
 
+    /**
+     * @return string|false
+     */
     protected function getDataFilterForTable($table)
     {
         $filters = $this->getDefaultDataFilters();
         return $filters[$table] ?? false;
     }
 
-
-    protected function getPassword($password = null)
+    /**
+     * @return string
+     */
+    protected function getPassword(string $password = null)
     {
         if ($password) {
             $this->password = $password;
@@ -62,13 +114,13 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     public function dbDumpSchema(
-        $opts = [
+        array $opts = [
             'file'           => InputOption::VALUE_REQUIRED,
             'password'       => InputOption::VALUE_REQUIRED,
             'include-tables' => InputOption::VALUE_REQUIRED,
             'exclude-tables' => InputOption::VALUE_REQUIRED
         ]
-    ) {
+    ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpSchemaFile;
 
         $includeTables = [];
@@ -100,14 +152,14 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     public function dbDumpDataFull(
-        $opts = [
+        array $opts = [
             'file'                    => InputOption::VALUE_REQUIRED,
             'password'                => InputOption::VALUE_REQUIRED,
             'include-tables'          => InputOption::VALUE_REQUIRED,
             'exclude-tables'          => InputOption::VALUE_REQUIRED,
             'ignore-default-excludes' => false
         ]
-    ) {
+    ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpFullFile;
 
         $pass = $this->getPassword($opts['password']);
@@ -141,9 +193,9 @@ abstract class RoboFile extends \Robo\Tasks
 
 
     public function dbDumpDataPartial(
-        $startDate,
-        $endDate,
-        $opts = [
+        string $startDate,
+        string $endDate,
+        array $opts = [
             'dir'               => InputOption::VALUE_REQUIRED,
             'append'            => false,
             'include-tables'    => InputOption::VALUE_REQUIRED,
@@ -151,7 +203,7 @@ abstract class RoboFile extends \Robo\Tasks
             'starting-sequence' => '10',
             'password'          => InputOption::VALUE_REQUIRED,
         ]
-    ) {
+    ) : Result {
         $dir = $opts['dir'] ?? $this->dumpDir;
 
         $pass = $this->getPassword($opts['password']);
@@ -206,12 +258,12 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     public function dbDumpGrants(
-        $opts = [
+        array $opts = [
             'file'       => InputOption::VALUE_REQUIRED,
             'password'   => InputOption::VALUE_REQUIRED,
             'appendFile' => false
         ]
-    ) {
+    ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpGrantsFile;
 
         $pass = $this->getPassword($opts['password']);
@@ -239,8 +291,8 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     public function dbInitializeDev(
-        $startDate,
-        $endDate
+        string $startDate,
+        string $endDate
     ): void {
         $commands = [
             'db:dump-schema',

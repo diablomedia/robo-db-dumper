@@ -27,4 +27,3 @@
         "phpstan-analysis": "phpstan analyse -l 7 -c phpstan.neon src"
     }
 }
-
