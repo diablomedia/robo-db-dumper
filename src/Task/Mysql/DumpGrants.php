@@ -119,7 +119,7 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
     protected function replacePassword(string $line) : string
     {
         if (!empty($this->destinationPassword)) {
-            return preg_replace('/<secret>/', "'" . $this->destinationPassword . "'", $line);
+            return preg_replace('/PASSWORD <secret>/', "'" . $this->destinationPassword . "'", $line);
         }
 
         // If no password specified, remove the IDENTIFIED BY section completely
