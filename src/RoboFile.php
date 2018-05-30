@@ -148,7 +148,7 @@ abstract class RoboFile extends \Robo\Tasks
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
-            'lock-tables' => false
+            'lock-tables'    => false
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -191,7 +191,7 @@ abstract class RoboFile extends \Robo\Tasks
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
-            'lock-tables' => false
+            'lock-tables'    => false
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
