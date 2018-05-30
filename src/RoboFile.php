@@ -56,6 +56,11 @@ abstract class RoboFile extends \Robo\Tasks
      */
     protected $dumpGrantsFile = '9999-Grants.sql';
 
+    /**
+     * @var bool[]|string[]
+     */
+    protected $additionalDumpSettings = [];
+
     public function __construct()
     {
         $required = [
@@ -140,13 +145,16 @@ abstract class RoboFile extends \Robo\Tasks
         $this->say(sprintf('  Including: %s', empty($includeTables) ? 'All' : implode(', ', $includeTables)));
         $this->say(sprintf('  Excluding: %s', empty($excludeTables) ? 'None' : implode(', ', $excludeTables)));
 
+        $dumpSettings = [
+            'include-tables' => $includeTables,
+            'exclude-tables' => $excludeTables,
+            'lock-tables'    => false
+        ];
+        $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
+
         return $this->taskDumpSchema($this->dsn, $this->username, $pass)
             ->getCollectionBuilderCurrentTask()
-            ->withDumpSettings([
-                'include-tables' => $includeTables,
-                'exclude-tables' => $excludeTables,
-                'lock-tables'    => false
-            ])
+            ->withDumpSettings($dumpSettings)
             ->toFile($file)
             ->run();
     }
@@ -180,13 +188,16 @@ abstract class RoboFile extends \Robo\Tasks
         $this->say(sprintf('  Including: %s', empty($includeTables) ? 'All' : implode(', ', $includeTables)));
         $this->say(sprintf('  Excluding: %s', empty($excludeTables) ? 'None' : implode(', ', $excludeTables)));
 
+        $dumpSettings = [
+            'include-tables' => $includeTables,
+            'exclude-tables' => $excludeTables,
+            'lock-tables'    => false
+        ];
+        $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
+
         return $this->taskDumpData($this->dsn, $this->username, $pass)
             ->getCollectionBuilderCurrentTask()
-            ->withDumpSettings([
-                'include-tables' => $includeTables,
-                'exclude-tables' => $excludeTables,
-                'lock-tables'    => false
-            ])
+            ->withDumpSettings($dumpSettings)
             ->toFile($file)
             ->run();
     }
@@ -243,10 +254,15 @@ abstract class RoboFile extends \Robo\Tasks
         $this->say('Dumping partial data for tables:');
         $this->say('  ' . implode(', ', $includeTables));
 
+        $dumpSettings = [
+            'lock-tables' => false
+        ];
+        $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
+
         $task = $this->taskDumpDataPartial($this->dsn, $this->username, $pass)
             ->getCollectionBuilderCurrentTask()
             ->toDir($dir)
-            ->withDumpSettings(['lock-tables' => false])
+            ->withDumpSettings($dumpSettings)
             ->withFilters($filters)
             ->startingFileSequence($opts['starting-sequence']);
 
