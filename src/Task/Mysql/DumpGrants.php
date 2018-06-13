@@ -12,54 +12,31 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
     use BuilderAwareTrait;
 
     /**
-     * @var string
+     * @var string $dsn
+     * @var string $user
+     * @var string $pass
+     * @var string $file
+     * @var string $sourceUser
+     * @var string $sourceHost
+     * @var string $sourceDatabase
+     * @var string $destinationUser
+     * @var string $destinationHost
+     * @var string $destinationPassword
+     * @var string $destinationDatabase
+     * @var bool $append
      */
-    protected $dsn;
-
-    /**
-     * @var string
-     */
-    protected $user;
-
-    /**
-     * @var string
-     */
-    protected $pass;
-
-    /**
-     * @var string
-     */
-    protected $file;
-
-    /**
-     * @var string
-     */
-    protected $sourceUser;
-
-    /**
-     * @var string
-     */
-    protected $sourceHost;
-
-    /**
-     * @var string
-     */
-    protected $destinationUser;
-
-    /**
-     * @var string
-     */
-    protected $destinationHost;
-
-    /**
-     * @var string
-     */
-    protected $destinationPassword;
-
-    /**
-     * @var bool
-     */
-    protected $append;
+    protected $dsn,
+              $user,
+              $pass,
+              $file,
+              $sourceUser,
+              $sourceHost,
+              $sourceDatabase,
+              $destinationUser,
+              $destinationHost,
+              $destinationPassword,
+              $destinationDatabase,
+              $append;
 
     public function __construct(string $dsn, string $user, string $pass)
     {
@@ -76,6 +53,13 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         return $this;
     }
 
+    public function sourceDatabase(string $database) : DumpGrants
+    {
+        $this->sourceDatabase = $database;
+
+        return $this;
+    }
+
     public function destinationUser(string $grantUser, string $grantHost) : DumpGrants
     {
         $this->destinationUser = $grantUser;
@@ -84,9 +68,17 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         return $this;
     }
 
+
     public function destinationPassword(string $password) : DumpGrants
     {
         $this->destinationPassword = $password;
+
+        return $this;
+    }
+    
+    public function destinationDatabase(string $destinationDatabase) : DumpGrants
+    {
+        $this->destinationDatabase = $destinationDatabase;
 
         return $this;
     }
@@ -126,10 +118,18 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         return preg_replace('/ IDENTIFIED BY PASSWORD <secret>/', '', $line);
     }
 
+    protected function replaceDatabase(string $line) : string
+    {
+        if (!empty($this->destinationDatabase)) {
+            return preg_replace('/`' . $this->sourceDatabase . '`/', '`' . $this->destinationDatabase . '`', $line);
+        }
+    }
+
     protected function prepareLineForOutput(string $line) : string
     {
         $line = $this->replaceUser($line);
         $line = $this->replacePassword($line);
+        $line = $this->replaceDatabase($line);
         return $line . ';';
     }
 
