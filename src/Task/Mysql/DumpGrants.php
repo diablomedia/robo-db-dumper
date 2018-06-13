@@ -25,18 +25,18 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
      * @var string $destinationDatabase
      * @var bool $append
      */
-    protected $dsn,
-              $user,
-              $pass,
-              $file,
-              $sourceUser,
-              $sourceHost,
-              $sourceDatabase,
-              $destinationUser,
-              $destinationHost,
-              $destinationPassword,
-              $destinationDatabase,
-              $append;
+    protected $dsn;
+    protected $user;
+    protected $pass;
+    protected $file;
+    protected $sourceUser;
+    protected $sourceHost;
+    protected $sourceDatabase;
+    protected $destinationUser;
+    protected $destinationHost;
+    protected $destinationPassword;
+    protected $destinationDatabase;
+    protected $append;
 
     public function __construct(string $dsn, string $user, string $pass)
     {
