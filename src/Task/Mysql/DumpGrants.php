@@ -123,6 +123,8 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         if (!empty($this->destinationDatabase)) {
             return preg_replace('/`' . $this->sourceDatabase . '`/', '`' . $this->destinationDatabase . '`', $line);
         }
+
+        return $line;
     }
 
     protected function prepareLineForOutput(string $line) : string
