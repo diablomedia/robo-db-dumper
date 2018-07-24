@@ -86,7 +86,7 @@ class Import extends BaseTask implements BuilderAwareInterface
         return $this;
     }
 
-   public function run(): Result
+    public function run(): Result
     {
         if (empty($this->files)) {
             return Result::error($this, 'No files are specified to import');
