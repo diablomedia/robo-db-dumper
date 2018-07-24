@@ -74,6 +74,9 @@ class Import extends BaseTask implements BuilderAwareInterface
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     public function addFiles(array $files): self
     {
         foreach ($files as $file) {
@@ -83,15 +86,7 @@ class Import extends BaseTask implements BuilderAwareInterface
         return $this;
     }
 
-    public function addGlob($globPattern): self
-    {
-        $files = glob($globPattern);
-        $this->addFiles($files);
-
-        return $this;
-    }
-
-    public function run(): Result
+   public function run(): Result
     {
         if (empty($this->files)) {
             return Result::error($this, 'No files are specified to import');
@@ -99,6 +94,7 @@ class Import extends BaseTask implements BuilderAwareInterface
 
         $collection = $this->collectionBuilder();
         foreach ($this->files as $file) {
+            $collection->printTaskInfo('Importing ' . $file);
             $collection->taskExec($this->command)
                 ->option('host', $this->host, '=')
                 ->option('user', $this->user, '=')
