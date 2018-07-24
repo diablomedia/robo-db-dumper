@@ -48,7 +48,7 @@ class Import extends BaseTask implements BuilderAwareInterface
     public function __construct(string $host, string $db, string $user, string $pass)
     {
         $this->host = $host;
-        $this->db = $db;
+        $this->db   = $db;
         $this->user = $user;
         $this->pass = $pass;
     }
