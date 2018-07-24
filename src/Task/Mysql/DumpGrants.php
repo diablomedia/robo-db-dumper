@@ -2,40 +2,59 @@
 namespace DiabloMedia\Robo\Task\Mysql;
 
 use PDO;
-use Robo\Result;
-use Robo\Task\BaseTask;
 use Robo\Common\BuilderAwareTrait;
 use Robo\Contract\BuilderAwareInterface;
+use Robo\Result;
+use Robo\Task\BaseTask;
 
 class DumpGrants extends BaseTask implements BuilderAwareInterface
 {
     use BuilderAwareTrait;
 
-    /**
-     * @var string $dsn
-     * @var string $user
-     * @var string $pass
-     * @var string $file
-     * @var string $sourceUser
-     * @var string $sourceHost
-     * @var string $sourceDatabase
-     * @var string $destinationUser
-     * @var string $destinationHost
-     * @var string $destinationPassword
-     * @var string $destinationDatabase
-     * @var bool $append
-     */
     protected $dsn;
+    /**
+     * @var string
+     */
     protected $user;
+    /**
+     * @var string
+     */
     protected $pass;
+    /**
+     * @var string
+     */
     protected $file;
+    /**
+     * @var string
+     */
     protected $sourceUser;
+    /**
+     * @var string
+     */
     protected $sourceHost;
+    /**
+     * @var string
+     */
     protected $sourceDatabase;
+    /**
+     * @var string
+     */
     protected $destinationUser;
+    /**
+     * @var string
+     */
     protected $destinationHost;
+    /**
+     * @var string
+     */
     protected $destinationPassword;
+    /**
+     * @var string
+     */
     protected $destinationDatabase;
+    /**
+     * @var bool
+     */
     protected $append;
 
     public function __construct(string $dsn, string $user, string $pass)
