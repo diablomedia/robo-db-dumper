@@ -61,6 +61,11 @@ abstract class RoboFile extends \Robo\Tasks
      */
     protected $additionalDumpSettings = [];
 
+    /**
+     * RoboFile constructor.
+     *
+     * @throws Exception
+     */
     public function __construct()
     {
         $required = [
@@ -118,6 +123,9 @@ abstract class RoboFile extends \Robo\Tasks
         return $this->password;
     }
 
+    /**
+     * Dump the database schema to a file
+     */
     public function dbDumpSchema(
         array $opts = [
             'file'           => InputOption::VALUE_REQUIRED,
@@ -159,6 +167,9 @@ abstract class RoboFile extends \Robo\Tasks
             ->run();
     }
 
+    /**
+     * Dump data from all tables (unless excluded or defined as a partial table)
+     */
     public function dbDumpDataFull(
         array $opts = [
             'file'                    => InputOption::VALUE_REQUIRED,
@@ -203,6 +214,11 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
 
+    /**
+     * Dump partial data from specific tables using provided filters
+     *
+     * @throws Exception
+     */
     public function dbDumpDataPartial(
         string $startDate,
         string $endDate,
@@ -273,6 +289,9 @@ abstract class RoboFile extends \Robo\Tasks
         return $task->run();
     }
 
+    /**
+     * Dump GRANTs for appropriate users to a file
+     */
     public function dbDumpGrants(
         array $opts = [
             'file'       => InputOption::VALUE_REQUIRED,
@@ -306,6 +325,9 @@ abstract class RoboFile extends \Robo\Tasks
         return $collection->run();
     }
 
+    /**
+     * Initialize development database from a production source
+     */
     public function dbInitializeDev(
         string $startDate,
         string $endDate
