@@ -173,6 +173,7 @@ abstract class RoboFile extends \Robo\Tasks
     public function dbDumpDataFull(
         array $opts = [
             'file'                    => InputOption::VALUE_REQUIRED,
+            'append'                  => false,
             'password'                => InputOption::VALUE_REQUIRED,
             'include-tables'          => InputOption::VALUE_REQUIRED,
             'exclude-tables'          => InputOption::VALUE_REQUIRED,
@@ -206,11 +207,16 @@ abstract class RoboFile extends \Robo\Tasks
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
-        return $this->taskDumpData($this->dsn, $this->username, $pass)
+        $task = $this->taskDumpData($this->dsn, $this->username, $pass)
             ->getCollectionBuilderCurrentTask()
             ->withDumpSettings($dumpSettings)
-            ->toFile($file)
-            ->run();
+            ->toFile($file);
+
+        if ($opts['append'] === true) {
+            $task->append();
+        }
+
+        return $task->run();
     }
 
 
@@ -290,13 +296,13 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     /**
-     * Dump GRANTs for appropriate users to a file
+     * Dump CREATE GRANTS for users defined in getGrantUsers to a file
      */
     public function dbDumpGrants(
         array $opts = [
             'file'       => InputOption::VALUE_REQUIRED,
             'password'   => InputOption::VALUE_REQUIRED,
-            'appendFile' => false
+            'append'     => false
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpGrantsFile;
@@ -306,7 +312,7 @@ abstract class RoboFile extends \Robo\Tasks
         $users      = $this->getGrantUsers();
         $collection = $this->collectionBuilder();
 
-        $appendFile = $opts['appendFile'];
+        $appendFile = $opts['append'];
         foreach ($users as $user) {
             $this->say(sprintf('Dumping grants for %s@%s', $user['user'], $user['host']));
             $task = $collection->taskDumpGrants($this->dsn, $this->username, $pass)
@@ -346,6 +352,51 @@ abstract class RoboFile extends \Robo\Tasks
                 $arguments = ['vendor/bin/robo', $command, $startDate, $endDate, '--password', $pass];
             } else {
                 $arguments = ['vendor/bin/robo', $command, '--password', $pass];
+            }
+            $statusCode = \Robo\Robo::run(
+                $arguments,
+                self::class
+            );
+
+            if ($statusCode !== 0) {
+                throw new Exception('Command ' . $command . ' failed');
+            }
+        }
+    }
+
+    /**
+     * Dump data from partial and (optionally) full tables using --insert-ignore
+     *
+     * --exclude-full-tables will skip full table dumps (prevents db:dump-data-full from being called)
+     * --overwrite-full-tables will overwrite all data in full tables (prevents --append from being passed to db:dump-data-full)
+     */
+    public function dbAppendDev(
+        string $startDate,
+        string $endDate,
+        array $opts = ['exclude-full-tables' => false, 'overwrite-full-tables' => false]
+    ): void {
+        $commands = [
+            'db:dump-data-partial',
+        ];
+
+        if ($opts['exclude-full-tables'] === true && $opts['overwrite-full-tables'] === true) {
+            throw new Exception('You cannot use --exclude-full-tables and --overwrite-full-tables simultaneously!');
+        }
+
+        if ($opts['exclude-full-tables'] === false) {
+            $commands[] = 'db:dump-data-full';
+        }
+
+        $pass = $this->getPassword();
+
+        foreach ($commands as $command) {
+            if ($command == 'db:dump-data-partial') {
+                $arguments = ['vendor/bin/robo', $command, $startDate, $endDate, '--password', $pass, '--append'];
+            } else {
+                $arguments = ['vendor/bin/robo', $command, '--password', $pass];
+                if ($opts['overwrite-full-tables'] === false) {
+                    $arguments[] = '--append';
+                }
             }
             $statusCode = \Robo\Robo::run(
                 $arguments,
