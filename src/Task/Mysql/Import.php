@@ -16,34 +16,37 @@ class Import extends BaseTask implements BuilderAwareInterface
     use IO;
     use ResourceExistenceChecker;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $host;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     protected $db;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     protected $user;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     protected $pass;
+
+    /** @var array */
+    protected $files = [];
+
     /**
+     * Allows us to omit the database name on CLI for specified files
+     *
+     * Some files may issue a CREATE DATABASE statement, and passing
+     * a database name on the CLI would fail if database does not exist
+     *
      * @var array
      */
-    protected $files = [];
-    /**
-     * @var bool
-     */
+    protected $filesThatDoNotRequireDbName = [];
+
+    /** @var bool */
     protected $skipConfirmation = false;
-    /**
-     * @var string
-     */
+
+    /** @var string */
     protected $command = 'mysql';
+
 
     public function __construct(string $host, string $db, string $user, string $pass)
     {
@@ -63,13 +66,16 @@ class Import extends BaseTask implements BuilderAwareInterface
     /**
      * @throws Exception
      */
-    public function addFile($file): self
+    public function addFile($file, bool $importRequiresDbName = true): self
     {
         if (!$this->isFile($file)) {
             throw new Exception('File does not exist: ' . $file);
         }
 
         $this->files[] = $file;
+        if ($importRequiresDbName === false) {
+            $this->filesThatDoNotRequireDbName[] = $file;
+        }
 
         return $this;
     }
@@ -77,10 +83,10 @@ class Import extends BaseTask implements BuilderAwareInterface
     /**
      * @throws Exception
      */
-    public function addFiles(array $files): self
+    public function addFiles(array $files, bool $importRequiresDbName = true): self
     {
         foreach ($files as $file) {
-            $this->addFile($file);
+            $this->addFile($file, $importRequiresDbName);
         }
 
         return $this;
@@ -95,13 +101,17 @@ class Import extends BaseTask implements BuilderAwareInterface
         $collection = $this->collectionBuilder();
         foreach ($this->files as $file) {
             $collection->printTaskInfo('Importing ' . $file);
-            $collection->taskExec($this->command)
-                ->option('host', $this->host, '=')
-                ->option('user', $this->user, '=')
-                ->option('password', $this->pass, '=')
-                ->arg($this->db)
-                ->rawArg('<')
-                ->arg($file);
+            $task = $collection->taskExec($this->command);
+            $task->option('host', $this->host, '=');
+            $task->option('user', $this->user, '=');
+            $task->option('password', $this->pass, '=');
+
+            if (!in_array($file, $this->filesThatDoNotRequireDbName)) {
+                $task->arg($this->db);
+            }
+
+            $task->rawArg('<');
+            $task->arg($file);
         }
 
         return $collection->run();
