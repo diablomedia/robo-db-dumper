@@ -128,10 +128,11 @@ abstract class RoboFile extends \Robo\Tasks
      */
     public function dbDumpSchema(
         array $opts = [
-            'file'           => InputOption::VALUE_REQUIRED,
-            'password'       => InputOption::VALUE_REQUIRED,
-            'include-tables' => InputOption::VALUE_REQUIRED,
-            'exclude-tables' => InputOption::VALUE_REQUIRED
+            'file'               => InputOption::VALUE_REQUIRED,
+            'password'           => InputOption::VALUE_REQUIRED,
+            'include-tables'     => InputOption::VALUE_REQUIRED,
+            'exclude-tables'     => InputOption::VALUE_REQUIRED,
+            'no-create-database' => false
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpSchemaFile;
@@ -156,7 +157,8 @@ abstract class RoboFile extends \Robo\Tasks
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
-            'lock-tables'    => false
+            'lock-tables'    => false,
+            'databases'      => !$opts['no-create-database']
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
