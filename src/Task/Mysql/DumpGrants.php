@@ -137,7 +137,6 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         }
 
         return $line;
-
     }
 
     protected function replaceDatabase(string $line) : string
