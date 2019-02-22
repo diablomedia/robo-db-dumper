@@ -129,12 +129,14 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
 
     protected function replacePassword(string $line) : string
     {
-        if (!empty($this->destinationPassword)) {
-            return preg_replace('/PASSWORD <secret>/', "'" . $this->destinationPassword . "'", $line);
+        // Strip IDENTIFIED BY PASSWORD <secret> section from MySQL 5.6
+        $line = preg_replace('/ IDENTIFIED BY PASSWORD <secret>/', '', $line);
+
+        if (!empty($this->destinationPassword) && preg_match('/^GRANT USAGE ON/', $line)) {
+            $line .= sprintf(" IDENTIFIED BY '%s'", $this->destinationPassword);
         }
 
-        // If no password specified, remove the IDENTIFIED BY section completely
-        return preg_replace('/ IDENTIFIED BY PASSWORD <secret>/', '', $line);
+        return $line;
     }
 
     protected function replaceDatabase(string $line) : string
