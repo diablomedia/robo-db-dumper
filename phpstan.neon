@@ -1,7 +1,10 @@
 parameters:
+  level: 1
+  paths:
+    - ./src
   ignoreErrors:
     # The analyser can't follow these due to Robo's use of magic methods and call_user_func_array
-    - '#Method Robo\\Tasks::task\(\) invoked with 4 parameters, 0 required\.#'
-    - '#Method Robo\\Tasks::task\(\) invoked with 5 parameters, 0 required\.#'
-    - '#Call to an undefined method Robo\\Contract\\TaskInterface::withDumpSettings\(\)\.#'
-    - '#Call to an undefined method Robo\\Contract\\TaskInterface::toDir\(\)\.#'
+    #- '#Method Robo\\Tasks::task\(\) invoked with 4 parameters, 0 required\.#'
+    #- '#Method Robo\\Tasks::task\(\) invoked with 5 parameters, 0 required\.#'
+    #- '#Call to an undefined method Robo\\Contract\\TaskInterface::withDumpSettings\(\)\.#'
+    #- '#Call to an undefined method Robo\\Contract\\TaskInterface::toDir\(\)\.#'
