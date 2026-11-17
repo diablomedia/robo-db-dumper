@@ -6,52 +6,65 @@ use Robo\Common\BuilderAwareTrait;
 use Robo\Contract\BuilderAwareInterface;
 use Robo\Result;
 use Robo\Task\BaseTask;
+use RuntimeException;
 
 class DumpGrants extends BaseTask implements BuilderAwareInterface
 {
     use BuilderAwareTrait;
 
+    /** @var string */
     protected $dsn;
+
     /**
      * @var string
      */
     protected $user;
+
     /**
      * @var string
      */
     protected $pass;
+
     /**
      * @var string
      */
     protected $file;
+
     /**
      * @var string
      */
     protected $sourceUser;
+
     /**
      * @var string
      */
     protected $sourceHost;
+
     /**
      * @var string
      */
     protected $sourceDatabase;
+
     /**
      * @var string
      */
     protected $destinationUser;
+
     /**
      * @var string
      */
     protected $destinationHost;
+
     /**
      * @var string
      */
     protected $destinationPassword;
+
     /**
      * @var string
      */
     protected $destinationDatabase;
+
     /**
      * @var bool
      */
@@ -94,7 +107,7 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
 
         return $this;
     }
-    
+
     public function destinationDatabase(string $destinationDatabase) : DumpGrants
     {
         $this->destinationDatabase = $destinationDatabase;
@@ -121,7 +134,7 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         if (!empty($this->destinationUser)) {
             $from = sprintf("/'%s'@'%s'/", $this->sourceUser, $this->sourceHost);
             $to   = sprintf("'%s'@'%s'", $this->destinationUser, $this->destinationHost);
-            return preg_replace($from, $to, $line);
+            return $this->replacePattern($from, $to, $line);
         }
 
         return $line;
@@ -130,7 +143,7 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
     protected function replacePassword(string $line) : string
     {
         // Strip IDENTIFIED BY PASSWORD <secret> section from MySQL 5.6
-        $line = preg_replace('/ IDENTIFIED BY PASSWORD <secret>/', '', $line);
+        $line = $this->replacePattern('/ IDENTIFIED BY PASSWORD <secret>/', '', $line);
 
         if (!empty($this->destinationPassword) && preg_match('/^GRANT USAGE ON/', $line)) {
             $line .= sprintf(" IDENTIFIED BY '%s'", $this->destinationPassword);
@@ -142,10 +155,20 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
     protected function replaceDatabase(string $line) : string
     {
         if (!empty($this->destinationDatabase)) {
-            return preg_replace('/`' . $this->sourceDatabase . '`/', '`' . $this->destinationDatabase . '`', $line);
+            return $this->replacePattern('/`' . $this->sourceDatabase . '`/', '`' . $this->destinationDatabase . '`', $line);
         }
 
         return $line;
+    }
+
+    private function replacePattern(string $pattern, string $replacement, string $line): string
+    {
+        $result = preg_replace($pattern, $replacement, $line);
+        if ($result === null) {
+            throw new RuntimeException('Unable to rewrite grant statement: ' . preg_last_error_msg());
+        }
+
+        return $result;
     }
 
     protected function prepareLineForOutput(string $line) : string

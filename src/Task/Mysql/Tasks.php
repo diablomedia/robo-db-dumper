@@ -10,6 +10,9 @@ trait Tasks
         return $this->task(DumpGrants::class, $dsn, $user, $pass);
     }
 
+    /**
+     * @return CollectionBuilder
+     */
     protected function taskImport(string $host, string $db, string $user, string $pass)
     {
         return $this->task(Import::class, $host, $db, $user, $pass);

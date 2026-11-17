@@ -1,0 +1,41 @@
+<?php
+
+namespace Robo\Collection;
+
+use DiabloMedia\Robo\Task\Mysql\DumpGrants;
+use Robo\Contract\TaskInterface;
+use Robo\Task\Base\Exec;
+use Robo\Task\File\Write;
+
+/**
+ * Robo forwards task factories and fluent setters through __call().
+ *
+ * @template-covariant TTask of TaskInterface = TaskInterface
+ * @mixin TTask
+ * @method CollectionBuilder<DumpGrants> taskDumpGrants(string $dsn, string $user, string $pass)
+ * @method CollectionBuilder<Exec> taskExec(string $command)
+ * @method CollectionBuilder<Write> taskWriteToFile(string $file)
+ */
+class CollectionBuilder
+{
+    /**
+     * @return TTask|CompletionWrapper<TTask>
+     */
+    public function getCollectionBuilderCurrentTask()
+    {
+    }
+}
+
+/**
+ * Tasks transferred into a collection are wrapped, with setters forwarded.
+ *
+ * @template-covariant TTask of TaskInterface
+ * @mixin TTask
+ */
+class CompletionWrapper implements TaskInterface
+{
+    /** @return TTask */
+    public function original()
+    {
+    }
+}

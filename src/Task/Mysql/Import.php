@@ -28,7 +28,7 @@ class Import extends BaseTask implements BuilderAwareInterface
     /** @var string */
     protected $pass;
 
-    /** @var array */
+    /** @var string[] */
     protected $files = [];
 
     /**
@@ -37,7 +37,7 @@ class Import extends BaseTask implements BuilderAwareInterface
      * Some files may issue a CREATE DATABASE statement, and passing
      * a database name on the CLI would fail if database does not exist
      *
-     * @var array
+     * @var string[]
      */
     protected $filesThatDoNotRequireDbName = [];
 
@@ -56,6 +56,9 @@ class Import extends BaseTask implements BuilderAwareInterface
         $this->pass = $pass;
     }
 
+    /**
+     * @param string $command
+     */
     public function withMysqlCommand($command): self
     {
         $this->command = $command;
@@ -64,6 +67,7 @@ class Import extends BaseTask implements BuilderAwareInterface
     }
 
     /**
+     * @param string $file
      * @throws Exception
      */
     public function addFile($file, bool $importRequiresDbName = true): self
@@ -81,6 +85,7 @@ class Import extends BaseTask implements BuilderAwareInterface
     }
 
     /**
+     * @param string[] $files
      * @throws Exception
      */
     public function addFiles(array $files, bool $importRequiresDbName = true): self

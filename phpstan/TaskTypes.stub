@@ -1,0 +1,26 @@
+<?php
+
+// PHPStan validates stubs independently, so referenced task types are declared here.
+namespace Robo\Contract;
+
+interface TaskInterface
+{
+}
+
+namespace Robo\Task\Base;
+
+class Exec implements \Robo\Contract\TaskInterface
+{
+}
+
+namespace Robo\Task\File;
+
+class Write implements \Robo\Contract\TaskInterface
+{
+}
+
+namespace DiabloMedia\Robo\Task\Mysql;
+
+class DumpGrants implements \Robo\Contract\TaskInterface
+{
+}

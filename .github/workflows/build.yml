@@ -59,5 +59,7 @@ jobs:
           composer update --no-interaction --no-progress --prefer-dist --prefer-stable --optimize-autoloader "${args[@]}"
       - name: PHPStan
         run: composer phpstan
+      - name: Rector check
+        run: composer rector-check -- --no-progress-bar --ansi
       - name: Code style check
         run: composer style-check -- --format=checkstyle | cs2pr

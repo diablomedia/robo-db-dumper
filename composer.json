@@ -14,11 +14,14 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.95.31",
-        "phpstan/phpstan": "^2.3.6"
+        "phpstan/phpstan": "^2.3.6",
+        "rector/rector": "^2.8.5"
     },
     "scripts": {
         "style-check": "php-cs-fixer fix --dry-run -vv",
         "fix-style": "php-cs-fixer fix",
-        "phpstan": "phpstan analyse -c phpstan.neon --ansi"
+        "phpstan": "phpstan analyse -c phpstan.neon --ansi",
+        "rector-check": "rector process --dry-run",
+        "rector-fix": "rector process"
     }
 }
