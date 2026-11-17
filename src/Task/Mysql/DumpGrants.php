@@ -171,7 +171,7 @@ class DumpGrants extends BaseTask implements BuilderAwareInterface
         }
 
         $pdoOpt = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM,
         ];
         $pdo   = new PDO($this->dsn, $this->user, $this->pass, $pdoOpt);
         $query = "SHOW GRANTS FOR ?@?";

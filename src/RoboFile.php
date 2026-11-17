@@ -69,7 +69,7 @@ abstract class RoboFile extends \Robo\Tasks
     public function __construct()
     {
         $required = [
-            'hostname', 'database', 'dumpDir'
+            'hostname', 'database', 'dumpDir',
         ];
 
         foreach ($required as $property) {
@@ -132,7 +132,7 @@ abstract class RoboFile extends \Robo\Tasks
             'password'           => InputOption::VALUE_REQUIRED,
             'include-tables'     => InputOption::VALUE_REQUIRED,
             'exclude-tables'     => InputOption::VALUE_REQUIRED,
-            'no-create-database' => false
+            'no-create-database' => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpSchemaFile;
@@ -158,7 +158,7 @@ abstract class RoboFile extends \Robo\Tasks
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
             'lock-tables'    => false,
-            'databases'      => !$opts['no-create-database']
+            'databases'      => !$opts['no-create-database'],
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -179,7 +179,7 @@ abstract class RoboFile extends \Robo\Tasks
             'password'                => InputOption::VALUE_REQUIRED,
             'include-tables'          => InputOption::VALUE_REQUIRED,
             'exclude-tables'          => InputOption::VALUE_REQUIRED,
-            'ignore-default-excludes' => false
+            'ignore-default-excludes' => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpFullFile;
@@ -205,7 +205,7 @@ abstract class RoboFile extends \Robo\Tasks
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
-            'lock-tables'    => false
+            'lock-tables'    => false,
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -279,7 +279,7 @@ abstract class RoboFile extends \Robo\Tasks
         $this->say('  ' . implode(', ', $includeTables));
 
         $dumpSettings = [
-            'lock-tables' => false
+            'lock-tables' => false,
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -304,7 +304,7 @@ abstract class RoboFile extends \Robo\Tasks
         array $opts = [
             'file'       => InputOption::VALUE_REQUIRED,
             'password'   => InputOption::VALUE_REQUIRED,
-            'append'     => false
+            'append'     => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpGrantsFile;
@@ -344,7 +344,7 @@ abstract class RoboFile extends \Robo\Tasks
             'db:dump-schema',
             'db:dump-data-full',
             'db:dump-data-partial',
-            'db:dump-grants'
+            'db:dump-grants',
         ];
 
         $pass = $this->getPassword();
