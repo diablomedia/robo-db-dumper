@@ -1,0 +1,57 @@
+<?php
+
+namespace DiabloMedia\Robo\Task\MysqldumpPhp;
+
+use Robo\Collection\CollectionBuilder;
+use Robo\Contract\TaskInterface;
+
+trait Tasks
+{
+    /** @return CollectionBuilder<Dump> */
+    protected function taskDump(string $dsn, string $user, string $pass): CollectionBuilder
+    {
+    }
+
+    /** @return CollectionBuilder<DumpSchema> */
+    protected function taskDumpSchema(string $dsn, string $user, string $pass): CollectionBuilder
+    {
+    }
+
+    /** @return CollectionBuilder<DumpData> */
+    protected function taskDumpData(string $dsn, string $user, string $pass): CollectionBuilder
+    {
+    }
+
+    /** @return CollectionBuilder<DumpDataPartial> */
+    protected function taskDumpDataPartial(string $dsn, string $user, string $pass): CollectionBuilder
+    {
+    }
+}
+
+class Dump implements TaskInterface
+{
+    /**
+     * @param array<string, mixed> $dumpSettings
+     * @return $this
+     */
+    public function withDumpSettings(array $dumpSettings): Dump
+    {
+    }
+
+    /** @return $this */
+    public function toFile(string $file): Dump
+    {
+    }
+}
+
+class DumpSchema extends Dump
+{
+}
+
+class DumpData extends Dump
+{
+}
+
+class DumpDataPartial extends DumpData
+{
+}

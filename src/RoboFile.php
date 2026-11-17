@@ -69,7 +69,7 @@ abstract class RoboFile extends \Robo\Tasks
     public function __construct()
     {
         $required = [
-            'hostname', 'database', 'dumpDir'
+            'hostname', 'database', 'dumpDir',
         ];
 
         foreach ($required as $property) {
@@ -84,7 +84,7 @@ abstract class RoboFile extends \Robo\Tasks
     }
 
     /**
-     * @return string[]
+     * @return array<array{user: string, host: string, pass?: string}>
      */
     abstract protected function getGrantUsers();
 
@@ -99,6 +99,7 @@ abstract class RoboFile extends \Robo\Tasks
     abstract protected function getDefaultDataExcludes();
 
     /**
+     * @param array-key $table
      * @return string|false
      */
     protected function getDataFilterForTable($table)
@@ -110,7 +111,7 @@ abstract class RoboFile extends \Robo\Tasks
     /**
      * @return string
      */
-    protected function getPassword(string $password = null)
+    protected function getPassword(?string $password = null)
     {
         if ($password) {
             $this->password = $password;
@@ -125,6 +126,7 @@ abstract class RoboFile extends \Robo\Tasks
 
     /**
      * Dump the database schema to a file
+     * @param array<string, mixed> $opts
      */
     public function dbDumpSchema(
         array $opts = [
@@ -132,7 +134,7 @@ abstract class RoboFile extends \Robo\Tasks
             'password'           => InputOption::VALUE_REQUIRED,
             'include-tables'     => InputOption::VALUE_REQUIRED,
             'exclude-tables'     => InputOption::VALUE_REQUIRED,
-            'no-create-database' => false
+            'no-create-database' => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpSchemaFile;
@@ -151,14 +153,14 @@ abstract class RoboFile extends \Robo\Tasks
         }
 
         $this->say('Dumping prod schema (no data)');
-        $this->say(sprintf('  Including: %s', empty($includeTables) ? 'All' : implode(', ', $includeTables)));
-        $this->say(sprintf('  Excluding: %s', empty($excludeTables) ? 'None' : implode(', ', $excludeTables)));
+        $this->say(sprintf('  Including: %s', $includeTables === [] ? 'All' : implode(', ', $includeTables)));
+        $this->say(sprintf('  Excluding: %s', $excludeTables === [] ? 'None' : implode(', ', $excludeTables)));
 
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
             'lock-tables'    => false,
-            'databases'      => !$opts['no-create-database']
+            'databases'      => !$opts['no-create-database'],
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -171,6 +173,7 @@ abstract class RoboFile extends \Robo\Tasks
 
     /**
      * Dump data from all tables (unless excluded or defined as a partial table)
+     * @param array<string, mixed> $opts
      */
     public function dbDumpDataFull(
         array $opts = [
@@ -179,7 +182,7 @@ abstract class RoboFile extends \Robo\Tasks
             'password'                => InputOption::VALUE_REQUIRED,
             'include-tables'          => InputOption::VALUE_REQUIRED,
             'exclude-tables'          => InputOption::VALUE_REQUIRED,
-            'ignore-default-excludes' => false
+            'ignore-default-excludes' => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpFullFile;
@@ -199,13 +202,13 @@ abstract class RoboFile extends \Robo\Tasks
         }
 
         $this->say('Dumping full tables');
-        $this->say(sprintf('  Including: %s', empty($includeTables) ? 'All' : implode(', ', $includeTables)));
-        $this->say(sprintf('  Excluding: %s', empty($excludeTables) ? 'None' : implode(', ', $excludeTables)));
+        $this->say(sprintf('  Including: %s', $includeTables === [] ? 'All' : implode(', ', $includeTables)));
+        $this->say(sprintf('  Excluding: %s', $excludeTables === [] ? 'None' : implode(', ', $excludeTables)));
 
         $dumpSettings = [
             'include-tables' => $includeTables,
             'exclude-tables' => $excludeTables,
-            'lock-tables'    => false
+            'lock-tables'    => false,
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -226,6 +229,7 @@ abstract class RoboFile extends \Robo\Tasks
      * Dump partial data from specific tables using provided filters
      *
      * @throws Exception
+     * @param array<string, mixed> $opts
      */
     public function dbDumpDataPartial(
         string $startDate,
@@ -279,7 +283,7 @@ abstract class RoboFile extends \Robo\Tasks
         $this->say('  ' . implode(', ', $includeTables));
 
         $dumpSettings = [
-            'lock-tables' => false
+            'lock-tables' => false,
         ];
         $dumpSettings = array_merge($dumpSettings, $this->additionalDumpSettings);
 
@@ -299,12 +303,13 @@ abstract class RoboFile extends \Robo\Tasks
 
     /**
      * Dump CREATE GRANTS for users defined in getGrantUsers to a file
+     * @param array<string, mixed> $opts
      */
     public function dbDumpGrants(
         array $opts = [
             'file'       => InputOption::VALUE_REQUIRED,
             'password'   => InputOption::VALUE_REQUIRED,
-            'append'     => false
+            'append'     => false,
         ]
     ) : Result {
         $file = $opts['file'] ?? $this->dumpDir . DIRECTORY_SEPARATOR . $this->dumpGrantsFile;
@@ -344,17 +349,18 @@ abstract class RoboFile extends \Robo\Tasks
             'db:dump-schema',
             'db:dump-data-full',
             'db:dump-data-partial',
-            'db:dump-grants'
+            'db:dump-grants',
         ];
 
         $pass = $this->getPassword();
 
         foreach ($commands as $command) {
-            if ($command == 'db:dump-data-partial') {
+            if ($command === 'db:dump-data-partial') {
                 $arguments = ['vendor/bin/robo', $command, $startDate, $endDate, '--password', $pass];
             } else {
                 $arguments = ['vendor/bin/robo', $command, '--password', $pass];
             }
+
             $statusCode = \Robo\Robo::run(
                 $arguments,
                 self::class
@@ -371,6 +377,7 @@ abstract class RoboFile extends \Robo\Tasks
      *
      * --exclude-full-tables will skip full table dumps (prevents db:dump-data-full from being called)
      * --overwrite-full-tables will overwrite all data in full tables (prevents --append from being passed to db:dump-data-full)
+     * @param array<string, mixed> $opts
      */
     public function dbAppendDev(
         string $startDate,
@@ -392,7 +399,7 @@ abstract class RoboFile extends \Robo\Tasks
         $pass = $this->getPassword();
 
         foreach ($commands as $command) {
-            if ($command == 'db:dump-data-partial') {
+            if ($command === 'db:dump-data-partial') {
                 $arguments = ['vendor/bin/robo', $command, $startDate, $endDate, '--password', $pass, '--append'];
             } else {
                 $arguments = ['vendor/bin/robo', $command, '--password', $pass];
@@ -400,6 +407,7 @@ abstract class RoboFile extends \Robo\Tasks
                     $arguments[] = '--append';
                 }
             }
+
             $statusCode = \Robo\Robo::run(
                 $arguments,
                 self::class

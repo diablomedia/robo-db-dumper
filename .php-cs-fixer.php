@@ -8,9 +8,8 @@ $config = new PhpCsFixer\Config();
 return $config->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,
-        '@PHP70Migration' => true,
-        '@PHP71Migration' => true,
-        '@PHP71Migration:risky' => true,
+        '@PHP8x2Migration' => true,
+        '@PHP7x1Migration:risky' => true,
         'binary_operator_spaces' => ['operators' => ['=' => 'align', '=>' => 'align']],
         'single_quote' => false,
         'array_syntax' => ['syntax' => 'short'],
